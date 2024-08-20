@@ -1,7 +1,11 @@
 package first_come.first_come.domain.user;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 public class User {
 
