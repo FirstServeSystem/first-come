@@ -1,6 +1,4 @@
-FROM openjdk:17-jdk-alpine
-
-VOLUME /tmp
+FROM openjdk:21-slim
 
 ARG JAR_FILE=build/libs/*.jar
 
