@@ -2,6 +2,7 @@ package first_come.first_come.security.filter;
 
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -46,4 +47,12 @@ public class JwtUtil {
                 .signWith(secretKey)
                 .compact();
     }
+
+    // 토큰에서 추출한 사용자 이름이 제공된 UserDetails 객체의 사용자 이름과 일치하는지 확인
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String username = getUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isExpired(token));
+    }
+
+
 }

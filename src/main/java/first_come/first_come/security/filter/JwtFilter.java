@@ -1,7 +1,6 @@
 package first_come.first_come.security.filter;
 
-import first_come.first_come.domain.user.User;
-import first_come.first_come.security.service.CustomUserDetails;
+import first_come.first_come.security.service.CustomUserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,16 +9,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Slf4j
+@Slf4j(topic = "JWT 검증 및 인가")
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final CustomUserDetailsServiceImpl customUserDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -45,33 +47,43 @@ public class JwtFilter extends OncePerRequestFilter {
         // 토큰의 유효기간을 확인한다. JwtUtil 객체에서 구현해놓은 메소드를 통해서
         if (jwtUtil.isExpired(token)) {
 
-            System.out.println("token expired");
+            log.info("token expired");
             filterChain.doFilter(request, response);
 
             //조건이 해당되면 메소드 종료 (필수)
             return;
         }
 
-        // 최종적으로 유효한 토큰이 존재하면 일시적인 세션을 만들어서 security 컨텍스트홀더라는 시큐리티 세션에다가 유저를 저장해주어
-        // 유저가 특정 경로를 요청할 때 진행할 수 있게 한다.
+        // 토큰에서 사용자 이름을 추출한다
         String username = jwtUtil.getUsername(token);
 
-        //userEntity를 생성하여 값 set
-        User userEntity = new User();
-        userEntity.setEmail(username);
-        userEntity.setPassword("temppassword");  // 비밀번호를 요청해야할 때마다 db에서 비밀번호를 확인하는건 비효율적이기 때문에 컨텍스트 홀더에 정확한 비밀번호를 넣지 않겠다. 일시적으로 비밀번호를 강제로 만들어 설정해준다.
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-        //UserDetails에 회원 정보 객체 담기
-        CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-        //스프링 시큐리티 인증 토큰 생성
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+            if (jwtUtil.validateToken(token, userDetails)) {
+                setAuthentication(username);
+                log.info("JWT 필터: 인증이 성공적으로 설정되었습니다. 사용자명: {}", username);
+            }
+        }
 
-        //세션에 사용자 등록
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-
-        //검증이 완료됏으니 다음 필터로 넘긴다.
+        // 필터 체인을 계속 진행한다.
         filterChain.doFilter(request, response);
-
     }
+
+    // 인증 처리
+    public void setAuthentication(String username) {
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        Authentication authentication = createAuthentication(username);
+        context.setAuthentication(authentication);
+
+        SecurityContextHolder.setContext(context);
+    }
+
+    // 인증 객체 생성
+    private Authentication createAuthentication(String username) {
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    }
+
 }
