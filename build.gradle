@@ -25,6 +25,9 @@ repositories {
 
 dependencies {
 
+	// 이메일 인증
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 	// JWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
