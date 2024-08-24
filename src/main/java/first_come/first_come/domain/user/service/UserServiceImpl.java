@@ -1,6 +1,6 @@
 package first_come.first_come.domain.user.service;
 
-import first_come.first_come.domain.mail.EmailService;
+import first_come.first_come.domain.mail.EmailServiceImpl;
 import first_come.first_come.domain.user.User;
 import first_come.first_come.domain.user.UserRepository;
 import first_come.first_come.domain.user.dto.EmailRequestDto;
@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final EncryptionUtils encryptionUtils;
-    private final EmailService emailService;
+    private final EmailServiceImpl emailService;
     private final RedisUtil redisUtil;
 
     @Override
