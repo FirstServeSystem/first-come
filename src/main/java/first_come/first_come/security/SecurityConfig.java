@@ -1,7 +1,9 @@
 package first_come.first_come.security;
 
+import first_come.first_come.security.filter.JwtFilter;
 import first_come.first_come.security.filter.JwtUtil;
 import first_come.first_come.security.filter.LoginFilter;
+import first_come.first_come.security.service.CustomUserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,23 +37,26 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain FilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain FilterChain(HttpSecurity http, CustomUserDetailsServiceImpl customUserDetailsServiceImpl) throws Exception {
+
+        // Create LoginFilter and JwtFilter instances
+        AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
+        LoginFilter loginFilter = new LoginFilter(authManager, jwtUtil);
+        JwtFilter jwtFilter = new JwtFilter(jwtUtil, customUserDetailsServiceImpl);
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable);
+                .httpBasic(AbstractHttpConfigurer::disable)
 
-        http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/join").permitAll()
-                        .anyRequest().authenticated());
+                        .requestMatchers("/api/signup", "/api/verify-email").permitAll()
+                        .anyRequest().authenticated())
 
-        http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class) // LoginFilter를 UsernamePasswordAuthenticationFilter 전에 추가
+                .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class) // JwtFilter를 UsernamePasswordAuthenticationFilter 후에 추가
 
-        // 세션 설정
-        http
+                // 세션 설정
                 .sessionManagement((session) ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
