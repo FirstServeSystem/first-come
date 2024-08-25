@@ -1,4 +1,4 @@
-package first_come.first_come.domain.user;
+package first_come.first_come.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,7 +25,7 @@ public class User {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, length = 13)
+    @Column(nullable = false)
     private String phone;
 
     @Column(nullable = false)
@@ -33,6 +33,9 @@ public class User {
 
     @Setter
     private boolean isVerified;
+
+    @Enumerated(EnumType.STRING)
+    private UserRoleEnum role;
 
     public static User of(String email, String password, String name, String phone, String address) {
         return User.builder()
@@ -42,6 +45,7 @@ public class User {
                 .phone(phone)
                 .address(address)
                 .isVerified(false)
+                .role(UserRoleEnum.USER)
                 .build();
     }
 
