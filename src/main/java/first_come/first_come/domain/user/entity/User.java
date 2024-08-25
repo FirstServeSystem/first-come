@@ -1,17 +1,24 @@
 package first_come.first_come.domain.user.entity;
 
+import first_come.first_come.domain.order.Order;
+import first_come.first_come.domain.wishlist.Wishlist;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @Setter
@@ -36,6 +43,13 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private UserRoleEnum role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Order> orders = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Wishlist> wishlists;
+
 
     public static User of(String email, String password, String name, String phone, String address) {
         return User.builder()
