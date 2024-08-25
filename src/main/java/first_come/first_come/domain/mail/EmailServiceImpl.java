@@ -1,6 +1,5 @@
 package first_come.first_come.domain.mail;
 
-import first_come.first_come.domain.user.User;
 import first_come.first_come.global.redis.RedisUtil;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -19,13 +18,13 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public void sendEmail(User user) {
+    public void sendEmail(String email) {
 
         String verificationCode = generateVerificationCode();
-        sendAuthEmail(user.getEmail(), verificationCode);
+        sendAuthEmail(email, verificationCode);
 
         // 유효 시간(5분) { email : verificationCode } 저장
-        redisUtil.setDataExpire(user.getEmail(), verificationCode, 60 * 5L);
+        redisUtil.setDataExpire(email, verificationCode, 60 * 5L);
     }
 
 
