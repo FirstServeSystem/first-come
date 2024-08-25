@@ -1,10 +1,11 @@
 package first_come.first_come.security;
 
-import first_come.first_come.security.filter.JwtFilter;
+import first_come.first_come.security.filter.JwtAuthenticationFilter;
+import first_come.first_come.security.filter.JwtAuthorizationFilter;
 import first_come.first_come.security.filter.JwtUtil;
-import first_come.first_come.security.filter.LoginFilter;
-import first_come.first_come.security.service.CustomUserDetailsServiceImpl;
+import first_come.first_come.security.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,54 +15,65 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity // Spring Security 지원을 가능하게 함
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final AuthenticationConfiguration authenticationConfiguration;
 
     @Bean
-    public BCryptPasswordEncoder encodePassword() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    //AuthenticationManager Bean 등록
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
     @Bean
-    public SecurityFilterChain FilterChain(HttpSecurity http, CustomUserDetailsServiceImpl customUserDetailsServiceImpl) throws Exception {
+    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil);
+        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
+        return filter;
+    }
 
-        // Create LoginFilter and JwtFilter instances
-        AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
-        LoginFilter loginFilter = new LoginFilter(authManager, jwtUtil);
-        JwtFilter jwtFilter = new JwtFilter(jwtUtil, customUserDetailsServiceImpl);
+    @Bean
+    public JwtAuthorizationFilter jwtAuthorizationFilter() {
+        return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
+    }
 
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // CSRF 설정
+        http.csrf(AbstractHttpConfigurer::disable);
 
-                .authorizeHttpRequests((auth) -> auth
+        // 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
+        http.sessionManagement((sessionManagement) ->
+                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
+
+        http.authorizeHttpRequests(
+                (authorizeHttpRequests) -> authorizeHttpRequests
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
+                        .requestMatchers("/").permitAll() // 메인 페이지 요청 허가
                         .requestMatchers("/api/signup", "/api/verify-email").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/api/signin").permitAll()
+                        .anyRequest().authenticated() // 그 외 모든 요청 인증처리
+        );
 
-                .addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class) // LoginFilter를 UsernamePasswordAuthenticationFilter 전에 추가
-                .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class) // JwtFilter를 UsernamePasswordAuthenticationFilter 후에 추가
-
-                // 세션 설정
-                .sessionManagement((session) ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        // 필터 관리
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
 
         return http.build();
     }
 }
-
 
