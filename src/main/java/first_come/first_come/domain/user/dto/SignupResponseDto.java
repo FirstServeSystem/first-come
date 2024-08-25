@@ -1,6 +1,6 @@
 package first_come.first_come.domain.user.dto;
 
-import first_come.first_come.domain.user.User;
+import first_come.first_come.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 
