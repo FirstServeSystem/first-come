@@ -1,15 +1,21 @@
-package first_come.first_come.domain.product;
+package first_come.first_come.domain.product.entity;
 
-import first_come.first_come.domain.order.OrderItem;
-import first_come.first_come.domain.wishlist.WishlistItem;
+import first_come.first_come.domain.order.entity.OrderItem;
+import first_come.first_come.domain.wishlist.entity.WishlistItem;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "products")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Product {
 
     @Id
@@ -22,9 +28,6 @@ public class Product {
 
     @Column(nullable = false)
     private int price;
-
-    @OneToMany(mappedBy = "product")
-    private List<OrderItem> orders;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;
