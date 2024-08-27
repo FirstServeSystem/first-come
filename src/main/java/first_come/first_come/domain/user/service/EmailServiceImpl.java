@@ -1,4 +1,4 @@
-package first_come.first_come.domain.mail;
+package first_come.first_come.domain.user.service;
 
 import first_come.first_come.global.redis.RedisUtil;
 import jakarta.mail.MessagingException;
