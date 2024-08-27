@@ -1,7 +1,6 @@
 package first_come.first_come.domain.user.service;
 
-import first_come.first_come.domain.mail.EmailService;
-import first_come.first_come.domain.user.UserRepository;
+import first_come.first_come.domain.user.repository.UserRepository;
 import first_come.first_come.domain.user.dto.EmailRequestDto;
 import first_come.first_come.domain.user.dto.SignupRequestDto;
 import first_come.first_come.domain.user.dto.SignupResponseDto;

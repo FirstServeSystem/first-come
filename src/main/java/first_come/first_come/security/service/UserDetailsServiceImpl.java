@@ -1,6 +1,6 @@
 package first_come.first_come.security.service;
 
-import first_come.first_come.domain.user.UserRepository;
+import first_come.first_come.domain.user.repository.UserRepository;
 import first_come.first_come.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

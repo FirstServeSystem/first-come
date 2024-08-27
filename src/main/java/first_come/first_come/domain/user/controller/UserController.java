@@ -1,4 +1,4 @@
-package first_come.first_come.domain.user;
+package first_come.first_come.domain.user.controller;
 
 import first_come.first_come.domain.user.dto.EmailRequestDto;
 import first_come.first_come.domain.user.dto.SignupRequestDto;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
 

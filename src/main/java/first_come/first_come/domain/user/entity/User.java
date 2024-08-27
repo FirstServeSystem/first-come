@@ -1,7 +1,7 @@
 package first_come.first_come.domain.user.entity;
 
-import first_come.first_come.domain.order.Order;
-import first_come.first_come.domain.wishlist.Wishlist;
+import first_come.first_come.domain.order.entity.Order;
+import first_come.first_come.domain.wishlist.entity.Wishlist;
 import jakarta.persistence.*;
 import lombok.*;
 

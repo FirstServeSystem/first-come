@@ -1,4 +1,4 @@
-package first_come.first_come.domain.user;
+package first_come.first_come.domain.user.repository;
 
 import first_come.first_come.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
