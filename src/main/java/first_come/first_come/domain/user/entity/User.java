@@ -44,6 +44,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRoleEnum role;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
 
