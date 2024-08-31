@@ -34,4 +34,10 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<WishlistItem> wishlistItems;
+
+    // product postconstructdata 때문에 필요한 생성자
+    public Product(String name, int price) {
+        this.name = name;
+        this.price = price;
+    }
 }
