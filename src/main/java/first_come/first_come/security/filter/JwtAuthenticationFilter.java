@@ -52,7 +52,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         UserRoleEnum role = ((UserDetailsImpl) authResult.getPrincipal()).getRole();
 
         String token = jwtUtil.createToken(email, role);
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
+        //response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
+
+        // 응답의 Content-Type을 JSON으로 설정
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // JSON 형태로 응답 바디에 토큰을 담아서 반환
+        String jsonResponse = String.format("{\"token\": \"%s\"}", token);
+        response.getWriter().write(jsonResponse);
     }
 
     @Override
