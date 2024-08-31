@@ -1,15 +1,15 @@
-package first_come.first_come.domain.wishlist;
+package first_come.first_come.domain.wishlist.entity;
 
-import first_come.first_come.domain.product.Product;
+import first_come.first_come.domain.product.entity.Product;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "wishlist_item")
 public class WishlistItem {
 
@@ -24,4 +24,5 @@ public class WishlistItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
 }
