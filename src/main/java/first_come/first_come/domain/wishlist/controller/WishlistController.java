@@ -53,9 +53,6 @@ public class WishlistController {
                                                                @AuthenticationPrincipal UserDetailsImpl userDetails,
                                                                @RequestBody AddWishlistItemRequestDto requestDto) {
 
-
-        log.info("Received productId: {}", requestDto.getProductId());
-        log.info("로그로글고그");
         WishlistResponseDto responseDto = wishlistService.addWishlistItem(wishlistId, userDetails, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
 

@@ -91,7 +91,6 @@ public class WishlistServiceImpl implements WishlistService {
                 () -> new IllegalArgumentException("존재하지 않는 위시리스트입니다.")
         );
 
-        log.info(String.valueOf(requestDto.getProductId()));
         Product product = productRepository.findById(requestDto.getProductId()).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 상품입니다.")
         );
