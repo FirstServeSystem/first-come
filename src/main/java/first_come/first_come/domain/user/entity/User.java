@@ -49,7 +49,7 @@ public class User {
     private List<Order> orders = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Wishlist> wishlists;
+    private List<Wishlist> wishlists = new ArrayList<>();
 
 
     public static User of(String email, String password, String name, String phone, String address) {
