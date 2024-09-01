@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,7 +34,7 @@ public class Product {
     private List<OrderItem> orderItems;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<WishlistItem> wishlistItems;
+    private List<WishlistItem> wishlistItems = new ArrayList<>();
 
     // product postconstructdata 때문에 필요한 생성자
     public Product(String name, int price) {
