@@ -37,6 +37,7 @@ public class Order {
     @Temporal(TemporalType.DATE)
     private LocalDate orderDate;
 
+    @Setter
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
