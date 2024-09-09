@@ -1,5 +1,6 @@
 package first_come.first_come.security;
 
+import jakarta.persistence.Convert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
 
+@Convert
 @Component
 @RequiredArgsConstructor
 public class EncryptionUtils {
